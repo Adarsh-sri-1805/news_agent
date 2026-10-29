@@ -1,0 +1,66 @@
+{
+  "verification": {
+    "total_samples": 7,
+    "correct_predictions": 7,
+    "accuracy": 1.0,
+    "macro_precision": 1.0,
+    "macro_recall": 1.0,
+    "macro_f1": 1.0,
+    "class_metrics": {
+      "supported": {
+        "class_name": "supported",
+        "true_positives": 2,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0
+      },
+      "contradicted": {
+        "class_name": "contradicted",
+        "true_positives": 2,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0
+      },
+      "insufficient_evidence": {
+        "class_name": "insufficient_evidence",
+        "true_positives": 3,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0
+      }
+    }
+  },
+  "retrieval": {
+    "total_queries": 4,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "gold_page_hit_rate_at_3": 1.0,
+    "gold_page_hit_rate_at_5": 1.0
+  },
+  "citations": {
+    "total_citations": 6,
+    "valid_citations": 5,
+    "invalid_citations": 1,
+    "invalid_citation_rate": 0.1667
+  },
+  "extraction": {
+    "total_candidates": 10,
+    "valid_assertions_total": 5,
+    "valid_assertions_retained": 5,
+    "fragments_total": 5,
+    "fragments_rejected": 5,
+    "fragment_rejection_rate": 1.0,
+    "claim_quality_rate": 1.0
+  },
+  "latency_ms": {}
+}
