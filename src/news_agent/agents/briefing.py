@@ -5,7 +5,7 @@ import logging
 from typing import Any
 from pydantic import BaseModel, Field
 
-from news_agent.llm.client import OllamaClient
+from news_agent.llm import BaseLLMClient, create_llm_client
 from news_agent.llm.exceptions import OllamaError
 from news_agent.models.article import NormalizedArticle
 from news_agent.models.base import utc_now
@@ -48,8 +48,8 @@ class LLMBriefPayload(BaseModel):
 class NewsBriefingAgent:
     """Specialist agent that synthesizes evidence-grounded news briefs with source provenance."""
 
-    def __init__(self, llm_client: OllamaClient | None = None) -> None:
-        self.llm_client = llm_client or OllamaClient()
+    def __init__(self, llm_client: BaseLLMClient | None = None) -> None:
+        self.llm_client = llm_client or create_llm_client()
 
     def generate_brief(
         self,

@@ -10,7 +10,7 @@ from news_agent.agents.briefing import NewsBriefingAgent
 from news_agent.agents.fact_checker import FactCheckingAgent, FactCheckingResult
 from news_agent.agents.researcher import NewsResearcherAgent, ResearcherResult
 from news_agent.agents.social import SocialContentAgent
-from news_agent.llm.client import OllamaClient
+from news_agent.llm import BaseLLMClient, create_llm_client
 from news_agent.models.article import NormalizedArticle
 from news_agent.models.base import utc_now
 from news_agent.models.brief import NewsBrief
@@ -57,9 +57,9 @@ class NewsIntelligenceOrchestrator:
         fact_checker: FactCheckingAgent | None = None,
         briefing_agent: NewsBriefingAgent | None = None,
         social_agent: SocialContentAgent | None = None,
-        llm_client: OllamaClient | None = None,
+        llm_client: BaseLLMClient | None = None,
     ) -> None:
-        self.llm_client = llm_client or OllamaClient()
+        self.llm_client = llm_client or create_llm_client()
         self.researcher = researcher or NewsResearcherAgent()
         self.fact_checker = fact_checker or FactCheckingAgent(llm_client=self.llm_client)
         self.briefing_agent = briefing_agent or NewsBriefingAgent(llm_client=self.llm_client)
@@ -142,6 +142,7 @@ class NewsIntelligenceOrchestrator:
             platforms=platforms,
             t_start=t_start,
             research_ms=res_ms,
+            evidence_corpus=research_out.articles,
         )
 
     def run_with_articles(
@@ -180,6 +181,7 @@ class NewsIntelligenceOrchestrator:
         platforms: list[str] | None = None,
         t_start: float | None = None,
         research_ms: float = 0.0,
+        evidence_corpus: list[NormalizedArticle] | None = None,
     ) -> OrchestratorResult:
         """Execute Fact-Checking, Briefing, and Social Content generation with error resilience and latency logging."""
         claims: list[FactualClaim] = []
@@ -191,7 +193,10 @@ class NewsIntelligenceOrchestrator:
         # 2. Fact-Checking Phase
         t_fc_start = time.perf_counter()
         try:
-            fc_result: FactCheckingResult = self.fact_checker.check_articles(articles)
+            fc_result: FactCheckingResult = self.fact_checker.check_articles(
+                articles=articles,
+                evidence_corpus=evidence_corpus,
+            )
             claims = fc_result.claims
             verification_results = fc_result.verification_results
         except Exception as err:

@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 import logging
 
-from news_agent.llm.client import OllamaClient
+from news_agent.llm import BaseLLMClient, create_llm_client
 from news_agent.models.article import NormalizedArticle
 from news_agent.models.base import utc_now
 from news_agent.models.claim import FactualClaim
@@ -34,11 +34,11 @@ class VerificationEngine:
 
     def __init__(
         self,
-        llm_client: OllamaClient | None = None,
+        llm_client: BaseLLMClient | None = None,
         extractor: ClaimExtractor | None = None,
         verifier: ClaimVerifier | None = None,
     ) -> None:
-        self.llm_client = llm_client or OllamaClient()
+        self.llm_client = llm_client or create_llm_client()
         self.extractor = extractor or ClaimExtractor(llm_client=self.llm_client)
         self.verifier = verifier or ClaimVerifier(llm_client=self.llm_client)
 
@@ -47,6 +47,7 @@ class VerificationEngine:
         articles: list[NormalizedArticle],
         top_k_evidence: int = 3,
         exclude_own_article: bool = True,
+        evidence_corpus: list[NormalizedArticle] | None = None,
     ) -> PipelineVerificationSummary:
         """Run the end-to-end verification engine over a set of ingested articles.
 
@@ -61,8 +62,9 @@ class VerificationEngine:
         if not articles:
             return summary
 
-        # 1. Build retrieval index across all available articles
-        retriever = EvidenceRetriever.from_articles(articles)
+        # 1. Build retrieval index across all available articles (use evidence_corpus if supplied)
+        corpus = evidence_corpus if evidence_corpus is not None else articles
+        retriever = EvidenceRetriever.from_articles(corpus)
 
         # 2. Extract claims from all articles
         all_claims: list[FactualClaim] = []

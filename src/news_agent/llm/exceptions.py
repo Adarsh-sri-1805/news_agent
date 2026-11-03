@@ -1,7 +1,11 @@
-"""Exceptions for the Ollama LLM integration."""
+"""Exceptions for the LLM integrations (Ollama & Google Gemini)."""
 
 
-class OllamaError(Exception):
+class LLMError(Exception):
+    """Base exception for all LLM-related errors."""
+
+
+class OllamaError(LLMError):
     """Base exception for all Ollama-related errors."""
 
 
@@ -33,3 +37,25 @@ class OllamaAPIError(OllamaError):
         super().__init__(f"Ollama API error {status_code}: {message}")
         self.status_code = status_code
         self.message = message
+
+
+class GeminiError(LLMError):
+    """Base exception for all Gemini-related errors."""
+
+
+class GeminiAPIError(GeminiError):
+    """Raised when Gemini API returns an HTTP error status."""
+
+    def __init__(self, status_code: int, message: str) -> None:
+        super().__init__(f"Gemini API error {status_code}: {message}")
+        self.status_code = status_code
+        self.message = message
+
+
+class GeminiResponseValidationError(GeminiError):
+    """Raised when Gemini output fails structured validation or JSON parsing."""
+
+    def __init__(self, message: str, raw_output: str, validation_error: Exception | None = None) -> None:
+        super().__init__(message)
+        self.raw_output = raw_output
+        self.validation_error = validation_error

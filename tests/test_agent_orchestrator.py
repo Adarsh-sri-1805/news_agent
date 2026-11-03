@@ -156,8 +156,15 @@ class TestNewsIntelligenceOrchestrator:
 
     def test_empty_ingestion_results_handled_gracefully(self):
         pipeline = IngestionPipeline(adapters=[MockStaticAdapter("EmptySource", [])])
+        mock_client = OllamaClient(
+            http_client=httpx.Client(
+                transport=httpx.MockTransport(lambda req: httpx.Response(200, json={"response": "{}"})),
+                base_url="http://mock:11434",
+            )
+        )
         orchestrator = NewsIntelligenceOrchestrator(
             researcher=NewsResearcherAgent(pipeline=pipeline),
+            llm_client=mock_client,
         )
 
         result = orchestrator.run(lookback_hours=24)
@@ -177,8 +184,15 @@ class TestNewsIntelligenceOrchestrator:
                 MockFailingAdapter("FaultySource"),
             ]
         )
+        mock_client = OllamaClient(
+            http_client=httpx.Client(
+                transport=httpx.MockTransport(lambda req: httpx.Response(200, json={"response": "{}"})),
+                base_url="http://mock:11434",
+            )
+        )
         orchestrator = NewsIntelligenceOrchestrator(
             researcher=NewsResearcherAgent(pipeline=pipeline),
+            llm_client=mock_client,
         )
 
         result = orchestrator.run()

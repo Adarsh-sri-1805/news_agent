@@ -126,6 +126,11 @@ body {
   box-shadow: 0 0 8px var(--status-insufficient);
 }
 
+.pulse-dot.demo {
+  background: #a855f7;
+  box-shadow: 0 0 8px #a855f7;
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(0.85); }

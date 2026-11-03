@@ -1,7 +1,7 @@
 """Unit tests for MCP server: initialization, tool registration, input validation, and execution."""
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import json
 import httpx
 import pytest
@@ -16,6 +16,7 @@ from news_agent.ingestion.pipeline import IngestionPipeline
 from news_agent.llm.client import OllamaClient
 from news_agent.mcp.server import create_mcp_server
 from news_agent.models.article import NormalizedArticle
+from news_agent.models.base import utc_now
 
 
 class MockStaticAdapter(BaseNewsSourceAdapter):
@@ -38,7 +39,7 @@ def make_test_article(id_val: str, title: str, content: str, publisher: str = "G
         content=content,
         publisher=publisher,
         source_url=f"https://example.com/{id_val}",  # type: ignore[arg-type]
-        published_at=datetime(2026, 10, 27, 10, 0, tzinfo=timezone.utc),
+        published_at=utc_now() - timedelta(hours=1),
     )
 
 

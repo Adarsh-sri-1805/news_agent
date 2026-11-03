@@ -5,7 +5,7 @@ from datetime import datetime
 import logging
 from typing import Any
 
-from news_agent.llm.client import OllamaClient
+from news_agent.llm import BaseLLMClient, create_llm_client
 from news_agent.models.article import NormalizedArticle
 from news_agent.models.base import utc_now
 from news_agent.models.claim import FactualClaim
@@ -35,12 +35,12 @@ class FactCheckingAgent:
 
     def __init__(
         self,
-        llm_client: OllamaClient | None = None,
+        llm_client: BaseLLMClient | None = None,
         verification_engine: VerificationEngine | None = None,
         extractor: ClaimExtractor | None = None,
         verifier: ClaimVerifier | None = None,
     ) -> None:
-        self.llm_client = llm_client or OllamaClient()
+        self.llm_client = llm_client or create_llm_client()
         self.extractor = extractor or ClaimExtractor(llm_client=self.llm_client)
         self.verifier = verifier or ClaimVerifier(llm_client=self.llm_client)
         self.verification_engine = verification_engine or VerificationEngine(
@@ -91,6 +91,7 @@ class FactCheckingAgent:
         articles: list[NormalizedArticle],
         top_k_evidence: int = 3,
         exclude_own_article: bool = True,
+        evidence_corpus: list[NormalizedArticle] | None = None,
     ) -> FactCheckingResult:
         """Run the end-to-end fact-checking pipeline across all supplied articles.
 
@@ -114,10 +115,12 @@ class FactCheckingAgent:
             articles=articles,
             top_k_evidence=top_k_evidence,
             exclude_own_article=exclude_own_article,
+            evidence_corpus=evidence_corpus,
         )
 
-        # Map article metadata for provenance lookups
-        article_lookup: dict[str, NormalizedArticle] = {a.id: a for a in articles}
+        # Map article metadata for provenance lookups across both articles and evidence corpus
+        combined_articles = list(articles) + (evidence_corpus or [])
+        article_lookup: dict[str, NormalizedArticle] = {a.id: a for a in combined_articles}
 
         # Build provenance map
         provenance_map: dict[str, dict[str, Any]] = {}

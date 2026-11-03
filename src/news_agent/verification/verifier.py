@@ -4,8 +4,7 @@ import logging
 from typing import Any
 from pydantic import AliasChoices, BaseModel, Field, model_validator
 
-from news_agent.llm.client import OllamaClient
-from news_agent.llm.exceptions import OllamaError
+from news_agent.llm import BaseLLMClient, LLMError, OllamaError, create_llm_client
 from news_agent.models.base import utc_now
 from news_agent.models.claim import FactualClaim
 from news_agent.models.evidence import EvidencePassage
@@ -91,10 +90,10 @@ class ClaimVerifier:
 
     def __init__(
         self,
-        llm_client: OllamaClient | None = None,
+        llm_client: BaseLLMClient | None = None,
         system_prompt: str = VERIFICATION_SYSTEM_PROMPT,
     ) -> None:
-        self.llm_client = llm_client or OllamaClient()
+        self.llm_client = llm_client or create_llm_client()
         self.system_prompt = system_prompt
 
     def verify_claim(
@@ -157,7 +156,7 @@ class ClaimVerifier:
                 response_model=LLMVerificationPayload,
                 system=self.system_prompt,
             )
-        except OllamaError as err:
+        except (LLMError, OllamaError, Exception) as err:
             logger.warning(
                 "Model verification error for claim '%s' (id=%s): %s",
                 claim.claim_text,

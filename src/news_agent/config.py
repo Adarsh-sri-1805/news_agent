@@ -1,6 +1,6 @@
 """Configuration management using Pydantic Settings."""
 
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,6 +19,21 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore",
+    )
+
+    # LLM Settings
+    llm_provider: str = Field(
+        default="auto",
+        description="Active LLM provider: 'auto' (prefers Gemini if key provided, else Ollama), 'gemini', or 'ollama'.",
+    )
+    gemini_api_key: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("gemini_api_key", "google_api_key"),
+        description="Google Gemini API key for fast cloud inference.",
+    )
+    gemini_model: str = Field(
+        default="gemini-3.5-flash",
+        description="Gemini model identifier (e.g. gemini-3.5-flash, gemini-3.5-flash-lite).",
     )
 
     ollama_base_url: str = Field(
@@ -50,6 +65,16 @@ class Settings(BaseSettings):
                 url="https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
                 publisher="The New York Times",
                 name="NYT World",
+            ),
+            FeedSourceConfig(
+                url="https://www.theguardian.com/world/rss",
+                publisher="The Guardian",
+                name="Guardian World",
+            ),
+            FeedSourceConfig(
+                url="https://feeds.npr.org/1001/rss.xml",
+                publisher="NPR News",
+                name="NPR Top Stories",
             ),
         ],
         description="List of configured RSS/Atom feed sources.",

@@ -7,6 +7,7 @@ import httpx
 from pydantic import BaseModel, ValidationError
 
 from news_agent.config import settings
+from news_agent.llm.base import BaseLLMClient
 from news_agent.llm.exceptions import (
     OllamaAPIError,
     OllamaConnectionError,
@@ -18,7 +19,7 @@ from news_agent.llm.exceptions import (
 T = TypeVar("T", bound=BaseModel)
 
 
-class OllamaClient:
+class OllamaClient(BaseLLMClient):
     """Synchronous client wrapper for interacting with a local Ollama instance.
 
     Design constraints:
@@ -27,6 +28,10 @@ class OllamaClient:
     - Strict validation of all model responses.
     - Explicit timeout and connection error handling.
     """
+
+    @property
+    def provider_name(self) -> str:
+        return "ollama"
 
     def __init__(
         self,

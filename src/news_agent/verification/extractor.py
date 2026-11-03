@@ -6,8 +6,7 @@ from typing import Any
 from pydantic import AliasChoices, BaseModel, Field, model_validator
 
 from news_agent.ingestion.dedup import calculate_title_similarity
-from news_agent.llm.client import OllamaClient
-from news_agent.llm.exceptions import OllamaError
+from news_agent.llm import BaseLLMClient, LLMError, OllamaError, create_llm_client
 from news_agent.models.article import NormalizedArticle
 from news_agent.models.base import utc_now
 from news_agent.models.claim import FactualClaim
@@ -145,12 +144,12 @@ class ClaimExtractor:
 
     def __init__(
         self,
-        llm_client: OllamaClient | None = None,
+        llm_client: BaseLLMClient | None = None,
         max_claims_per_article: int = 5,
         min_content_length: int = 30,
         system_prompt: str = EXTRACTION_SYSTEM_PROMPT,
     ) -> None:
-        self.llm_client = llm_client or OllamaClient()
+        self.llm_client = llm_client or create_llm_client()
         self.max_claims_per_article = max_claims_per_article
         self.min_content_length = min_content_length
         self.system_prompt = system_prompt

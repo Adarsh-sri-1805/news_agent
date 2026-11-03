@@ -5,7 +5,7 @@ import logging
 import re
 from typing import Any
 
-from news_agent.llm.client import OllamaClient
+from news_agent.llm import BaseLLMClient, create_llm_client
 from news_agent.models.article import NormalizedArticle
 from news_agent.models.brief import NewsBrief
 from news_agent.models.social import SocialMediaDraft
@@ -31,8 +31,8 @@ def sanitize_hashtag(tag: str) -> str:
 class SocialContentAgent:
     """Specialist agent that drafts platform-specific social copy with strict length and truth gates."""
 
-    def __init__(self, llm_client: OllamaClient | None = None) -> None:
-        self.llm_client = llm_client or OllamaClient()
+    def __init__(self, llm_client: BaseLLMClient | None = None) -> None:
+        self.llm_client = llm_client or create_llm_client()
 
     def generate_drafts(
         self,
