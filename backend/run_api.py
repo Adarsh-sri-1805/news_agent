@@ -6,6 +6,7 @@ Usage:
 """
 
 import argparse
+import os
 from pathlib import Path
 import sys
 
@@ -17,9 +18,12 @@ from news_agent.config import settings
 
 
 def main() -> None:
+    default_port = int(os.environ.get("PORT", 8000))
+    default_host = os.environ.get("HOST", "0.0.0.0" if os.environ.get("PORT") else "127.0.0.1")
+
     parser = argparse.ArgumentParser(description="Local News Intelligence Agent REST API Runner")
-    parser.add_argument("--host", default="127.0.0.1", help="Host interface to bind to (default: 127.0.0.1)")
-    parser.add_argument("--port", type=int, default=8000, help="Port to listen on (default: 8000)")
+    parser.add_argument("--host", default=default_host, help="Host interface to bind to (default: 0.0.0.0 if PORT set, else 127.0.0.1)")
+    parser.add_argument("--port", type=int, default=default_port, help=f"Port to listen on (default: {default_port})")
     parser.add_argument("--reload", action="store_true", help="Enable automatic code reloading")
     args = parser.parse_args()
 

@@ -27,11 +27,11 @@ def create_app() -> FastAPI:
         openapi_url="/openapi.json",
     )
 
-    # CORS configuration for local testing and developer UIs
+    # CORS configuration allowing cross-origin requests from any frontend (Render, Netlify, localhost)
     application.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
-        allow_credentials=True,
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )
